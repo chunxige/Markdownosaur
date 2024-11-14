@@ -266,6 +266,25 @@ public struct Markdownosaur: MarkupVisitor {
         
         return result
     }
+    
+    public func visitImage(_ image: Image) -> NSAttributedString {
+        guard let source = image.source, let url = URL(string: source) else {
+            return .init()
+        }
+        do {
+             let imageData = try Data.init(contentsOf: url)
+             guard let image = UIImage(data: imageData) else {
+                return .init()
+             }
+            let attach = NSTextAttachment(image: image)
+            let width = min(image.size.width, 200)
+            let height = width * image.size.height / image.size.width
+            attach.bounds = .init(x: 0, y: 0, width: width, height: height)
+            return .init(attachment: attach)
+        } catch {
+            return .init()
+        }
+    }
 }
 
 // MARK: - Extensions Land
